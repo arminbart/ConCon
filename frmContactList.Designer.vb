@@ -32,14 +32,16 @@ Partial Class frmContactList
 		Me.cmdRemove = New System.Windows.Forms.Button()
 		Me.cmdUnlightMultiUsage = New System.Windows.Forms.Button()
 		Me.cmdUnlightDuplicate = New System.Windows.Forms.Button()
+		Me.txtSearch = New System.Windows.Forms.TextBox()
+		Me.cmdSearch = New System.Windows.Forms.Button()
 		CType(Me.dgvContacts, System.ComponentModel.ISupportInitialize).BeginInit()
 		Me.SuspendLayout()
 		'
 		'dgvContacts
 		'
 		Me.dgvContacts.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-				  Or System.Windows.Forms.AnchorStyles.Left) _
-				  Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+			Or System.Windows.Forms.AnchorStyles.Left) _
+			Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
 		Me.dgvContacts.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
 		Me.dgvContacts.Location = New System.Drawing.Point(12, 68)
 		Me.dgvContacts.Name = "dgvContacts"
@@ -133,11 +135,29 @@ Partial Class frmContactList
 		Me.cmdUnlightDuplicate.Text = "Unhighlight selected Duplicate Contact"
 		Me.cmdUnlightDuplicate.UseVisualStyleBackColor = True
 		'
+		'txtSearch
+		'
+		Me.txtSearch.Location = New System.Drawing.Point(663, 14)
+		Me.txtSearch.Name = "txtSearch"
+		Me.txtSearch.Size = New System.Drawing.Size(135, 20)
+		Me.txtSearch.TabIndex = 10
+		'
+		'cmdSearch
+		'
+		Me.cmdSearch.Location = New System.Drawing.Point(663, 39)
+		Me.cmdSearch.Name = "cmdSearch"
+		Me.cmdSearch.Size = New System.Drawing.Size(135, 23)
+		Me.cmdSearch.TabIndex = 11
+		Me.cmdSearch.Text = "&Search"
+		Me.cmdSearch.UseVisualStyleBackColor = True
+		'
 		'frmContactList
 		'
 		Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
 		Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
 		Me.ClientSize = New System.Drawing.Size(1184, 712)
+		Me.Controls.Add(Me.cmdSearch)
+		Me.Controls.Add(Me.txtSearch)
 		Me.Controls.Add(Me.cmdUnlightDuplicate)
 		Me.Controls.Add(Me.cmdUnlightMultiUsage)
 		Me.Controls.Add(Me.cmdRemove)
@@ -167,4 +187,6 @@ Partial Class frmContactList
 	Friend WithEvents cmdRemove As System.Windows.Forms.Button
 	Friend WithEvents cmdUnlightMultiUsage As System.Windows.Forms.Button
 	Friend WithEvents cmdUnlightDuplicate As System.Windows.Forms.Button
+	Friend WithEvents txtSearch As TextBox
+	Friend WithEvents cmdSearch As Button
 End Class

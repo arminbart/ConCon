@@ -131,6 +131,7 @@
 	End Sub
 
 	Private Sub FilterRows()
+		Dim strSearch As String = txtSearch.Text.Trim().ToLower()
 
 		For Each oRow As DataGridViewRow In dgvContacts.Rows
 			Dim bVisible As Boolean = Not chkFilterMultiUsage.Checked AndAlso Not chkFilterDuplicates.Checked
@@ -143,6 +144,13 @@
 
 			If chkFilterDuplicates.Checked And Not bVisible Then
 				If oRow.Cells(0).Style.ForeColor = COLOR_HIGHLIGHT Then bVisible = True
+			End If
+
+			If bVisible AndAlso Not String.IsNullOrEmpty(strSearch) Then
+				bVisible = False
+				For Each oCell As DataGridViewCell In oRow.Cells
+					If oCell.Value IsNot Nothing AndAlso oCell.Value.ToString().ToLower().Contains(strSearch) Then bVisible = True : Exit For
+				Next
 			End If
 
 			If Not oRow.IsNewRow Then oRow.Visible = bVisible
@@ -212,6 +220,10 @@
 	End Sub
 
 	Private Sub chkFilterDuplicates_CheckedChanged(sender As System.Object, e As System.EventArgs) Handles chkFilterDuplicates.CheckedChanged
+		FilterRows()
+	End Sub
+
+	Private Sub cmdSearch_Click(sender As Object, e As EventArgs) Handles cmdSearch.Click
 		FilterRows()
 	End Sub
 
