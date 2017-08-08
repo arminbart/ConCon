@@ -16,7 +16,7 @@ Public Class clPSRawContactFile
 		While oReader.Read()
 			Select Case oReader.NodeType
 				Case XmlNodeType.Element
-					If oReader.Name.Equals("ws:PSRawContact", StringComparison.CurrentCultureIgnoreCase) Then
+					If IsAnyOf(oReader.Name, "ws:PSRawContact") Then
 						oContacts.Add(ReadContact(oReader))
 					End If
 			End Select
@@ -26,7 +26,7 @@ Public Class clPSRawContactFile
 	End Function
 
 	Private Function ReadContact(oReader As XmlReader) As clContact
-		Dim oContact As New clContact()
+		Dim oContact As New clContact(FileName)
 		Dim nElementStack As Integer = 1
 		Dim strCurrentNode As String = ""
 
@@ -34,10 +34,10 @@ Public Class clPSRawContactFile
 			Select Case oReader.NodeType
 				Case XmlNodeType.Element
 					nElementStack += 1
-					If strCurrentNode.Equals("ws:metadata") Then
+					If IsAnyOf(strCurrentNode, "ws:metadata") Then
 						' The metadata is boring -> Skip sub nodes
-					ElseIf strCurrentNode.Equals("ws:phones") Or strCurrentNode.Equals("ws:emails") Then
-						If oReader.Name.Equals("ws:PSPhone", StringComparison.CurrentCultureIgnoreCase) Or oReader.Name.Equals("ws:PSEmail", StringComparison.CurrentCultureIgnoreCase) Then
+					ElseIf IsAnyOf(strCurrentNode, "ws:phones", "ws:emails") Then
+						If IsAnyOf(oReader.Name, "ws:PSPhone", "ws:PSEmail") Then
 							oContact.AddChannel(ReadChannel(oReader, oReader.Name))
 							nElementStack -= 1
 						End If
@@ -60,7 +60,7 @@ Public Class clPSRawContactFile
 					If nElementStack = 1 Then
 						strCurrentNode = ""
 					ElseIf nElementStack = 0 Then
-						If oReader.Name.Equals("ws:PSRawContact", StringComparison.CurrentCultureIgnoreCase) Then
+						If IsAnyOf(oReader.Name, "ws:PSRawContact") Then
 							Exit While
 						Else
 							Throw New Exception("clPSRawContactFile.ReadContact(): Ending node tag </ws:PSRawContact> expected!")
@@ -74,15 +74,17 @@ Public Class clPSRawContactFile
 
 	Private Function GetChannelType(strNode As String, strType As String) As clContact.enType
 
-		If IsNumeric(strType) AndAlso strNode.Equals("ws:itype") Then
+		If IsNumeric(strType) AndAlso IsAnyOf(strNode, "ws:itype") Then
 			Select Case CInt(strType)
 				Case 1 : Return clContact.enType.PhonePrivate
 				Case 2 : Return clContact.enType.MobilePrivate
 				Case 3 : Return clContact.enType.PhoneBusiness
 			End Select
-		ElseIf IsNumeric(strType) AndAlso strNode.Equals("ws:iemailtype") Then
+		ElseIf IsNumeric(strType) AndAlso IsAnyOf(strNode, "ws:iemailtype") Then
 			Select Case CInt(strType)
 				Case 0 : Return clContact.enType.EMailPrivate
+				Case 1 : Return clContact.enType.EMailOther
+				Case 2 : Return clContact.enType.EMailBusiness
 			End Select
 		End If
 
@@ -101,15 +103,15 @@ Public Class clPSRawContactFile
 					nElementStack += 1
 					strCurrentNode = oReader.Name.ToLower()
 				Case XmlNodeType.Text
-					If strCurrentNode.Equals("ws:itype") Or strCurrentNode.Equals("ws:iemailtype") Then
+					If IsAnyOf(strCurrentNode, "ws:itype", "ws:iemailtype") Then
 						nType = GetChannelType(strCurrentNode, oReader.Value.Trim())
-					ElseIf strCurrentNode.Equals("ws:snumber") Or strCurrentNode.Equals("ws:semailaddr") Then
+					ElseIf IsAnyOf(strCurrentNode, "ws:snumber", "ws:semailaddr") Then
 						strContact = oReader.Value.Trim()
 					End If
 				Case XmlNodeType.EndElement
 					nElementStack -= 1
 					If nElementStack = 0 Then
-						If oReader.Name.Equals("ws:PSPhone", StringComparison.CurrentCultureIgnoreCase) Or oReader.Name.Equals("ws:PSEmail", StringComparison.CurrentCultureIgnoreCase) Then
+						If IsAnyOf(oReader.Name, "ws:PSPhone", "ws:PSEmail") Then
 							Exit While
 						Else
 							Throw New Exception("clPSRawContactFile.ReadPhone(): Ending node tag </ws:PSPhone> expected!")
@@ -145,7 +147,7 @@ Public Class clPSRawContactFile
 				Case XmlNodeType.EndElement
 					nElementStack -= 1
 					If nElementStack = 0 Then
-						If oReader.Name.Equals("ws:structuredName", StringComparison.CurrentCultureIgnoreCase) Then
+						If IsAnyOf(oReader.Name, "ws:structuredName") Then
 							Exit While
 						Else
 							Throw New Exception("clPSRawContactFile.ReadName(): Ending node tag </ws:structuredName> expected!")

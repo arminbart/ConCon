@@ -6,10 +6,13 @@ Public Class Main
 	Private Sub cmdNewListFromFolder_Click(sender As Object, e As EventArgs) Handles cmdNewListFromFolder.Click
 		Dim frm As New System.Windows.Forms.FolderBrowserDialog()
 
-		If frm.ShowDialog(Me) = DialogResult.OK Then
+		If True Then 'frm.ShowDialog(Me) = DialogResult.OK Then
 			'System.Diagnostics.Debugger.Break()
-			Dim strPath As String = frm.SelectedPath
+			'Dim strPath As String = frm.SelectedPath
 			'Dim strPath As String = "C:\Users\Armin\Downloads\Contact"
+			Dim strPath As String = "C:\Users\Armin.XPECTO\Downloads\Contacts"
+			'Dim strPath As String = "G:\Backup\HTC\HSM\BR_485433355657393039323139\B37456C4530BE810DC040F50DA72EDA09ADDFB0A"
+
 			If Not String.IsNullOrEmpty(strPath) Then
 				Dim oContacts As clContactList = ReadFilesFromFolder(strPath)
 				Dim frmContacts As New frmContactList(oContacts)

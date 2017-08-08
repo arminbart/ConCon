@@ -31,10 +31,10 @@ Partial Class Main
 		'cmdNewList
 		'
 		Me.cmdNewList.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-			Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+				  Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
 		Me.cmdNewList.Location = New System.Drawing.Point(12, 12)
 		Me.cmdNewList.Name = "cmdNewList"
-		Me.cmdNewList.Size = New System.Drawing.Size(619, 70)
+		Me.cmdNewList.Size = New System.Drawing.Size(710, 70)
 		Me.cmdNewList.TabIndex = 0
 		Me.cmdNewList.Text = "Open &Empty Contact List"
 		Me.cmdNewList.UseVisualStyleBackColor = True
@@ -42,10 +42,10 @@ Partial Class Main
 		'cmdNewListFromFile
 		'
 		Me.cmdNewListFromFile.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-			Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+				  Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
 		Me.cmdNewListFromFile.Location = New System.Drawing.Point(12, 88)
 		Me.cmdNewListFromFile.Name = "cmdNewListFromFile"
-		Me.cmdNewListFromFile.Size = New System.Drawing.Size(619, 70)
+		Me.cmdNewListFromFile.Size = New System.Drawing.Size(710, 70)
 		Me.cmdNewListFromFile.TabIndex = 1
 		Me.cmdNewListFromFile.Text = "Open Contact List from &File"
 		Me.cmdNewListFromFile.UseVisualStyleBackColor = True
@@ -53,28 +53,32 @@ Partial Class Main
 		'cmdNewListFromFolder
 		'
 		Me.cmdNewListFromFolder.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-			Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+				  Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
 		Me.cmdNewListFromFolder.Location = New System.Drawing.Point(12, 164)
 		Me.cmdNewListFromFolder.Name = "cmdNewListFromFolder"
-		Me.cmdNewListFromFolder.Size = New System.Drawing.Size(619, 70)
+		Me.cmdNewListFromFolder.Size = New System.Drawing.Size(710, 70)
 		Me.cmdNewListFromFolder.TabIndex = 2
 		Me.cmdNewListFromFolder.Text = "Open Contact List from Fol&der"
 		Me.cmdNewListFromFolder.UseVisualStyleBackColor = True
 		'
 		'txtLog
 		'
+		Me.txtLog.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+				  Or System.Windows.Forms.AnchorStyles.Left) _
+				  Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
 		Me.txtLog.Location = New System.Drawing.Point(12, 240)
 		Me.txtLog.Multiline = True
 		Me.txtLog.Name = "txtLog"
 		Me.txtLog.ReadOnly = True
-		Me.txtLog.Size = New System.Drawing.Size(619, 177)
+		Me.txtLog.ScrollBars = System.Windows.Forms.ScrollBars.Both
+		Me.txtLog.Size = New System.Drawing.Size(710, 210)
 		Me.txtLog.TabIndex = 3
 		'
 		'Main
 		'
 		Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
 		Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-		Me.ClientSize = New System.Drawing.Size(643, 429)
+		Me.ClientSize = New System.Drawing.Size(734, 462)
 		Me.Controls.Add(Me.txtLog)
 		Me.Controls.Add(Me.cmdNewListFromFolder)
 		Me.Controls.Add(Me.cmdNewListFromFile)

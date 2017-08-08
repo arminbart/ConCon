@@ -20,7 +20,7 @@
 			Try
 				Return Not GetContacts().IsEmpty
 			Catch ex As Exception
-				moLogger.Log("Error: " & ex.Message)
+				LogException(moLogger, ex, FileName)
 				Return False
 			End Try
 		End Get
@@ -41,7 +41,6 @@
 		Try
 			Dim oFile As clContactFile = Nothing
 
-			oLogger.Log("Read " & strFile)
 			If strFile.EndsWith(".xml", StringComparison.CurrentCultureIgnoreCase) Then
 				oFile = New clPSRawContactFile(strFile, oLogger)
 				If Not oFile.IsValidFile() Then oFile = Nothing
@@ -52,10 +51,22 @@
 
 			If oFile IsNot Nothing Then Return oFile.GetContacts()
 		Catch ex As Exception
-			oLogger.Log("Error: " & ex.Message)
+			LogException(oLogger, ex, strFile)
 		End Try
 
-		Return New clContactList
+		Return New clContactList()
 	End Function
 
+	Public Shared Sub LogException(oLogger As Logger, ex As Exception, strFile As String)
+		oLogger.Log("Error: " & ex.Message & vbCrLf & "   in File " & strFile)
+	End Sub
+
+	Public Shared Function IsAnyOf(str As String, ParamArray values As String()) As Boolean
+
+		For Each strValue In values
+			If str.Equals(strValue, StringComparison.CurrentCultureIgnoreCase) Then Return True
+		Next
+
+		Return False
+	End Function
 End Class
