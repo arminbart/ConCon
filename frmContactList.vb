@@ -17,19 +17,35 @@
 		For nPhoneType As clContact.enType = clContact.enType.PHONE_BEGIN + 1 To clContact.enType.PHONE_END - 1
 			cboPhoneTypes.Items.Add(clContact.GetTypeDesc(nPhoneType))
 		Next
+		If cboPhoneTypes.Items.Count > 0 Then cboPhoneTypes.SelectedIndex = 0
 
 		For nEMailType As clContact.enType = clContact.enType.EMAIL_BEGIN + 1 To clContact.enType.EMAIL_END - 1
 			cboEMailTypes.Items.Add(clContact.GetTypeDesc(nEMailType))
 		Next
+		If cboEMailTypes.Items.Count > 0 Then cboEMailTypes.SelectedIndex = 0
 
 		dgvContacts.SelectionMode = DataGridViewSelectionMode.FullRowSelect
 		dgvContacts.MultiSelect = False
 		dgvContacts.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells 'DataGridViewAutoSizeColumnsMode.Fill
 		dgvContacts.EditMode = DataGridViewEditMode.EditOnEnter
 
-		For Each oContact In oContacts
-			AddContact(oContact)
-		Next
+		' Respect column order at all places!!!
+		dgvContacts.Columns.Add("DisplayName", "Display Name")
+		dgvContacts.Columns.Add("Prefix", "Prefix")
+		dgvContacts.Columns.Add("FirstName", "First Name")
+		dgvContacts.Columns.Add("MiddleName", "Middle Name")
+		dgvContacts.Columns.Add("LastName", "Last Name")
+		dgvContacts.Columns.Add("Suffix", "Suffix")
+		dgvContacts.Columns.Add("Orga", "Company")
+		dgvContacts.Columns.Add("Title", "Title")
+		mnChannelOffset = dgvContacts.ColumnCount
+		dgvContacts.Columns.Add("File", "File Name")
+
+		If oContacts IsNot Nothing Then
+			For Each oContact In oContacts
+				AddContact(oContact)
+			Next
+		End If
 
 		dgvContacts.Refresh()
 
@@ -49,19 +65,8 @@
 
 	Private Sub AddContact(oContact As clContact)
 
-		If mnChannelOffset = 0 Then
-			' Respect column order at all places!!!
-			dgvContacts.Columns.Add("DisplayName", "Display Name")
-			dgvContacts.Columns.Add("Prefix", "Prefix")
-			dgvContacts.Columns.Add("FirstName", "First Name")
-			dgvContacts.Columns.Add("MiddleName", "Middle Name")
-			dgvContacts.Columns.Add("LastName", "Last Name")
-			mnChannelOffset = dgvContacts.ColumnCount
-			dgvContacts.Columns.Add("File", "File Name")
-		End If
-
 		' Respect column order at all places!!!
-		Dim nRow As Integer = dgvContacts.Rows.Add(oContact.DisplayName, oContact.Prefix, oContact.FirstName, oContact.MiddleName, oContact.LastName)
+		Dim nRow As Integer = dgvContacts.Rows.Add(oContact.DisplayName, oContact.Prefix, oContact.FirstName, oContact.MiddleName, oContact.LastName, oContact.Suffix, oContact.Organization, oContact.Title)
 
 		For i As Integer = 0 To oContact.Channels.Count - 1
 			Dim oChannel As clContact.clChannel = oContact.Channels.ElementAt(i)
@@ -177,16 +182,21 @@
 			If oItem.ToString().Equals(clContact.GetTypeDesc(nType)) Then cboTypes.Items.Remove(oItem) : Exit For
 		Next
 
-		If cboTypes.Items.Count = 0 Then cmdAdd.Enabled = False
+		If cboTypes.Items.Count > 0 Then
+			cboTypes.SelectedIndex = 0
+		Else
+			cboTypes.SelectedItem = Nothing
+			cmdAdd.Enabled = False
+		End If
 
 	End Sub
 
 	Private Sub cmdAddPhone_Click(sender As System.Object, e As System.EventArgs) Handles cmdAddPhone.Click
-		InsertColumn(clContact.GetTypeByDesc(cboPhoneTypes.SelectedItem.ToString()))
+		If Not String.IsNullOrEmpty(cboPhoneTypes.SelectedItem.ToString()) Then InsertColumn(clContact.GetTypeByDesc(cboPhoneTypes.SelectedItem.ToString()))
 	End Sub
 
 	Private Sub cmdAddEMail_Click(sender As System.Object, e As System.EventArgs) Handles cmdAddEMail.Click
-		InsertColumn(clContact.GetTypeByDesc(cboEMailTypes.SelectedItem.ToString()))
+		If Not String.IsNullOrEmpty(cboEMailTypes.SelectedItem.ToString()) Then InsertColumn(clContact.GetTypeByDesc(cboEMailTypes.SelectedItem.ToString()))
 	End Sub
 
 	Private Sub dgvContacts_RowPostPaint(ByVal sender As Object, ByVal e As DataGridViewRowPostPaintEventArgs) Handles dgvContacts.RowPostPaint
@@ -209,6 +219,8 @@
 
 		For Each oRow As DataGridViewRow In dgvContacts.SelectedRows
 			Dim oOldDuplicates As Dictionary(Of String, Integer) = moDuplicates
+
+			If oRow.IsNewRow Then Continue For
 
 			moDuplicates = New Dictionary(Of String, Integer)
 			For Each kvp As KeyValuePair(Of String, Integer) In oOldDuplicates

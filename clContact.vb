@@ -1,12 +1,14 @@
 ﻿Public Class clContact
 
-	' Name
 	Public DisplayName As String
 	Public Prefix As String
 	Public FirstName As String
 	Public MiddleName As String
 	Public LastName As String
 	Public Suffix As String
+
+	Public Organization As String
+	Public Title As String
 
 	Public Channels As New Generic.LinkedList(Of clContact.clChannel)()
 

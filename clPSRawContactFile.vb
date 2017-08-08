@@ -34,8 +34,13 @@ Public Class clPSRawContactFile
 			Select Case oReader.NodeType
 				Case XmlNodeType.Element
 					nElementStack += 1
-					If IsAnyOf(strCurrentNode, "ws:metadata") Then
+					If IsAnyOf(strCurrentNode, "ws:metadata", "ws:photo", "ws:events") Then
 						' The metadata is boring -> Skip sub nodes
+					ElseIf IsAnyOf(strCurrentNode, "ws:organizations") Then
+						If IsAnyOf(oReader.Name, "ws:PSOrganization") Then
+							ReadOrganization(oReader, oContact)
+							nElementStack -= 1
+						End If
 					ElseIf IsAnyOf(strCurrentNode, "ws:phones", "ws:emails") Then
 						If IsAnyOf(oReader.Name, "ws:PSPhone", "ws:PSEmail") Then
 							oContact.AddChannel(ReadChannel(oReader, oReader.Name))
@@ -45,9 +50,10 @@ Public Class clPSRawContactFile
 						strCurrentNode = oReader.Name.ToLower()
 
 						Select Case strCurrentNode
-							Case "ws:metadata" ' The metadata is boring -> Skip node
+							Case "ws:metadata", "ws:photo", "ws:events"	' Boring data -> Skip node
 							Case "ws:phones" ' The phones are indeed very interesting -> Parse sub nodes
 							Case "ws:emails" ' Same for e-mails
+							Case "ws:organizations"	' We also support one (but only one) organization
 							Case "ws:structuredname"
 								ReadName(oReader, oContact)
 								nElementStack -= 1
@@ -76,9 +82,12 @@ Public Class clPSRawContactFile
 
 		If IsNumeric(strType) AndAlso IsAnyOf(strNode, "ws:itype") Then
 			Select Case CInt(strType)
+				Case 0 : Return clContact.enType.MobileBusiness
 				Case 1 : Return clContact.enType.PhonePrivate
 				Case 2 : Return clContact.enType.MobilePrivate
 				Case 3 : Return clContact.enType.PhoneBusiness
+				Case 4 : Return clContact.enType.FaxBusiness
+				Case 5 : Return clContact.enType.FaxPrivate
 			End Select
 		ElseIf IsNumeric(strType) AndAlso IsAnyOf(strNode, "ws:iemailtype") Then
 			Select Case CInt(strType)
@@ -100,7 +109,7 @@ Public Class clPSRawContactFile
 		While oReader.Read()
 			Select Case oReader.NodeType
 				Case XmlNodeType.Element
-					nElementStack += 1
+					If Not oReader.IsEmptyElement Then nElementStack += 1
 					strCurrentNode = oReader.Name.ToLower()
 				Case XmlNodeType.Text
 					If IsAnyOf(strCurrentNode, "ws:itype", "ws:iemailtype") Then
@@ -114,7 +123,7 @@ Public Class clPSRawContactFile
 						If IsAnyOf(oReader.Name, "ws:PSPhone", "ws:PSEmail") Then
 							Exit While
 						Else
-							Throw New Exception("clPSRawContactFile.ReadPhone(): Ending node tag </ws:PSPhone> expected!")
+							Throw New Exception("clPSRawContactFile.ReadPhone(): Ending node tag </" & strNode & "> expected!")
 						End If
 					End If
 			End Select
@@ -130,7 +139,7 @@ Public Class clPSRawContactFile
 		While oReader.Read()
 			Select Case oReader.NodeType
 				Case XmlNodeType.Element
-					nElementStack += 1
+					If Not oReader.IsEmptyElement Then nElementStack += 1
 					strCurrentNode = oReader.Name.ToLower()
 				Case XmlNodeType.Text
 					Select Case strCurrentNode
@@ -151,6 +160,38 @@ Public Class clPSRawContactFile
 							Exit While
 						Else
 							Throw New Exception("clPSRawContactFile.ReadName(): Ending node tag </ws:structuredName> expected!")
+						End If
+					End If
+			End Select
+		End While
+
+	End Sub
+
+	Private Sub ReadOrganization(oReader As XmlReader, oContact As clContact)
+		Dim nElementStack As Integer = 1
+		Dim strCurrentNode As String = ""
+
+		While oReader.Read()
+			Select Case oReader.NodeType
+				Case XmlNodeType.Element
+					If Not oReader.IsEmptyElement Then nElementStack += 1
+					strCurrentNode = oReader.Name.ToLower()
+				Case XmlNodeType.Text
+					Select Case strCurrentNode
+						Case "ws:scompany" : oContact.Organization = oReader.Value.Trim()
+						Case "ws:stitle" : oContact.Title = oReader.Value.Trim()
+						Case "ws:_id", "ws:idataversion", "ws:iisprimary", "ws:iissuperprimary", "ws:itype", "ws:lrawcontactid", "ws:sDepartment"
+							' Boring
+						Case Else
+							Throw New Exception("clPSRawContactFile.ReadOrganization(): Unsupported node '" & strCurrentNode & "'!")
+					End Select
+				Case XmlNodeType.EndElement
+					nElementStack -= 1
+					If nElementStack = 0 Then
+						If IsAnyOf(oReader.Name, "ws:PSOrganization") Then
+							Exit While
+						Else
+							Throw New Exception("clPSRawContactFile.ReadOrganization(): Ending node tag </ws:PSOrganization> expected!")
 						End If
 					End If
 			End Select
