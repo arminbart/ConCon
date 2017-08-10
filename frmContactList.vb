@@ -81,6 +81,8 @@
 				chkFilterMultiUsage.Enabled = True
 				chkFilterMultiUsage.BackColor = COLOR_HIGHLIGHT
 			End If
+
+			If oChannel.Primary Then oCell.Style.Font = New Font(DataGridView.DefaultFont, FontStyle.Bold)
 		Next
 
 		Dim oFileCell As DataGridViewCell = dgvContacts.Rows(nRow).Cells(mnChannelOffset + moChannels.Count)
@@ -326,9 +328,12 @@
 		If oRow.Cells(7).Value IsNot Nothing Then oContact.Title = oRow.Cells(7).Value.ToString().Trim()
 
 		For i As Integer = 0 To moChannels.Count - 1
-			If oRow.Cells(mnChannelOffset + i).Value IsNot Nothing Then
-				Dim strChannel As String = oRow.Cells(mnChannelOffset + i).Value.ToString().Trim()
+			Dim oCell As DataGridViewCell = oRow.Cells(mnChannelOffset + i)
+
+			If IsNotEmpty(oCell.Value) Then
+				Dim strChannel As String = oCell.Value.ToString().Trim()
 				Dim nType As clContact.enType = moChannels(i)
+				Dim bPrimary As Boolean = oCell.Style.Font IsNot Nothing AndAlso oCell.Style.Font.Bold
 
 				For Each strContact As String In strChannel.Split({","c}, StringSplitOptions.RemoveEmptyEntries)
 					strContact = strContact.Trim()
@@ -337,7 +342,7 @@
 						strContact = "+49" & strContact.Substring(1)
 					End If
 
-					oContact.AddChannel(New clContact.clChannel(strContact, nType))
+					oContact.AddChannel(New clContact.clChannel(strContact, nType, bPrimary))
 				Next
 			End If
 		Next

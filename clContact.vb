@@ -84,11 +84,13 @@
 	Public Class clChannel
 		Public Type As enType
 		Public Contact As String
+		Public Primary As Boolean
 
-		Public Sub New(strContact As String, nType As enType)
+		Public Sub New(strContact As String, nType As enType, bPrimary As Boolean)
 			strContact = strContact.Trim().Replace(" ", "").ToLower()
 			Contact &= If(IsPhone(nType), FormatPhone(strContact), strContact)
 			Type = nType
+			Primary = bPrimary
 		End Sub
 
 		Public Shared Function FormatPhone(strPhone As String)

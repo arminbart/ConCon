@@ -110,6 +110,7 @@ Public Class clPSRawContactFile
 		Dim nType As clContact.enType = clContact.enType.Unknown
 		Dim nElementStack As Integer = 1
 		Dim strCurrentNode As String = ""
+		Dim bPrimary As Boolean = False
 
 		While oReader.Read()
 			Select Case oReader.NodeType
@@ -121,6 +122,8 @@ Public Class clPSRawContactFile
 						nType = GetChannelType(strCurrentNode, oReader.Value.Trim())
 					ElseIf IsAnyOf(strCurrentNode, "ws:snumber", "ws:semailaddr") Then
 						strContact = oReader.Value.Trim()
+					ElseIf IsAnyOf(strCurrentNode, "ws:iisprimary") Then
+						bPrimary = MakeInt(oReader.Value) > 0
 					End If
 				Case XmlNodeType.EndElement
 					nElementStack -= 1
@@ -134,7 +137,7 @@ Public Class clPSRawContactFile
 			End Select
 		End While
 
-		oContact.AddChannel(New clContact.clChannel(strContact, nType))
+		oContact.AddChannel(New clContact.clChannel(strContact, nType, bPrimary))
 	End Sub
 
 	Private Sub ReadName(oReader As XmlReader, oContact As clContact)

@@ -86,23 +86,27 @@ Public Class clVCardFile
 		Debug.Assert(False, "ADR tag not supported yet in vCards")
 	End Sub
 
-	Private Function GetChannelTagFromType(nType As clContact.enType) As String
-		Select Case nType
-			Case clContact.enType.MobilePrivate : Return "TEL;CELL"
-			Case clContact.enType.PhonePrivate : Return "TEL;HOME"
-			Case clContact.enType.FaxPrivate : Return "TEL;HOME;FAX"
-			Case clContact.enType.MobileBusiness : Return "TEL;CELL" ' Don't know if there are sub types of CELL
-			Case clContact.enType.PhoneBusiness : Return "TEL;WORK"
-			Case clContact.enType.FaxBusiness : Return "TEL;WORK;FAX"
-			Case clContact.enType.MobileOther : Return "TEL;CELL" ' Don't know if there are sub types of CELL
+	Private Function GetChannelTagFromType(nType As clContact.enType, bPrimary As Boolean) As String
+		Dim strTag As String = Nothing
 
-			Case clContact.enType.EMailPrivate : Return "EMAIL;HOME"
-			Case clContact.enType.EMailBusiness : Return "EMAIL;WORK"
-			Case clContact.enType.EMailOther : Return "EMAIL;X-INTERNET"
+		Select Case nType
+			Case clContact.enType.MobilePrivate : strTag = "TEL;CELL"
+			Case clContact.enType.PhonePrivate : strTag = "TEL;HOME"
+			Case clContact.enType.FaxPrivate : strTag = "TEL;HOME;FAX"
+			Case clContact.enType.MobileBusiness : strTag = "TEL;CELL" ' Don't know if there are sub types of CELL
+			Case clContact.enType.PhoneBusiness : strTag = "TEL;WORK"
+			Case clContact.enType.FaxBusiness : strTag = "TEL;WORK;FAX"
+			Case clContact.enType.MobileOther : strTag = "TEL;CELL"	' Don't know if there are sub types of CELL
+
+			Case clContact.enType.EMailPrivate : strTag = "EMAIL;HOME"
+			Case clContact.enType.EMailBusiness : strTag = "EMAIL;WORK"
+			Case clContact.enType.EMailOther : strTag = "EMAIL;X-INTERNET"
 
 			Case Else
 				Throw New Exception("clVCardFile.GetChannelTagFromType(): Unsupported channel type '" & nType & "'!")
 		End Select
+
+		Return If(bPrimary, strTag & ";PREF", strTag)
 	End Function
 
 	Private Function GetChannelType(strType As String, strSubType As String) As clContact.enType
@@ -131,8 +135,9 @@ Public Class clVCardFile
 	Private Sub ReadChannel(arrKey As String(), strValue As String, oContact As clContact)
 		Dim strType = arrKey(0)
 		Dim strSubType As String = arrKey(1).Replace(";PREF", "").Replace(";VOICE", "")
+		Dim bPrimary As Boolean = arrKey(1).Contains(";PREF")
 
-		oContact.AddChannel(New clContact.clChannel(strValue, GetChannelType(strType, strSubType)))
+		oContact.AddChannel(New clContact.clChannel(strValue, GetChannelType(strType, strSubType), bPrimary))
 	End Sub
 
 	Private Sub WriteContact(oWriter As StreamWriter, oContact As clContact)
@@ -144,7 +149,7 @@ Public Class clVCardFile
 
 		For Each oChannel As clContact.clChannel In oContact.Channels
 			For Each strContact In oChannel.Contact.Split({","c}, StringSplitOptions.RemoveEmptyEntries)
-				Write(oWriter, GetChannelTagFromType(oChannel.Type), strContact)
+				Write(oWriter, GetChannelTagFromType(oChannel.Type, oChannel.Primary), strContact)
 			Next
 		Next
 
