@@ -26,7 +26,7 @@
 
 		dgvContacts.SelectionMode = DataGridViewSelectionMode.FullRowSelect
 		dgvContacts.MultiSelect = False
-		dgvContacts.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells 'DataGridViewAutoSizeColumnsMode.Fill
+		dgvContacts.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells
 		dgvContacts.EditMode = DataGridViewEditMode.EditOnEnter
 
 		' Respect column order at all places!!!
@@ -73,7 +73,7 @@
 			Dim nCol As Integer = moChannels.IndexOf(oChannel.Type) : If nCol < 0 Then nCol = InsertColumn(oChannel.Type)
 			Dim oCell As DataGridViewCell = dgvContacts.Rows(nRow).Cells(mnChannelOffset + nCol)
 
-			If String.IsNullOrEmpty(oCell.Value) Then
+			If IsEmpty(oCell.Value) Then
 				oCell.Value = oChannel.Contact
 			Else
 				oCell.Style = StyleWithColor(oCell, COLOR_HIGHLIGHT, True)
@@ -94,7 +94,7 @@
 	Private Sub HighlightIfDuplicate(oContact As clContact, nRow As Integer)
 		Dim oRow As DataGridViewRow = dgvContacts.Rows.Item(nRow)
 
-		If Not String.IsNullOrEmpty(oContact.LastName) Then HighlightIfDuplicateHelper(oContact.LastName & "_" & oContact.FirstName, oRow)
+		If IsNotEmpty(oContact.LastName) Then HighlightIfDuplicateHelper(oContact.LastName & "_" & oContact.FirstName, oRow)
 
 		HighlightIfDuplicateHelper(oContact.DisplayName, oRow)
 
@@ -107,12 +107,12 @@
 	Private Sub HighlightIfDuplicateHelper(strKey As String, oRow As DataGridViewRow)
 
 		strKey = strKey.Trim().ToLower()
-		If Not String.IsNullOrEmpty(strKey) AndAlso moDuplicates.ContainsKey(strKey) Then
+		If IsNotEmpty(strKey) AndAlso moDuplicates.ContainsKey(strKey) Then
 			HighlightRow(oRow)
 			HighlightRow(dgvContacts.Rows.Item(moDuplicates.Item(strKey)))
 			chkFilterDuplicates.Enabled = True
 			chkFilterDuplicates.ForeColor = COLOR_HIGHLIGHT
-		ElseIf Not String.IsNullOrEmpty(strKey) Then
+		ElseIf IsNotEmpty(strKey) Then
 			moDuplicates.Add(strKey, oRow.Index)
 		End If
 
@@ -131,7 +131,9 @@
 	End Sub
 
 	Private Sub FilterRows()
-		Dim strSearch As String = txtSearch.Text.Trim().ToLower()
+		Dim strFilter As String = txtSearch.Text.Trim().ToLower()
+
+		fraSearch.Enabled = False
 
 		For Each oRow As DataGridViewRow In dgvContacts.Rows
 			Dim bVisible As Boolean = Not chkFilterMultiUsage.Checked AndAlso Not chkFilterDuplicates.Checked
@@ -146,15 +148,22 @@
 				If oRow.Cells(0).Style.ForeColor = COLOR_HIGHLIGHT Then bVisible = True
 			End If
 
-			If bVisible AndAlso Not String.IsNullOrEmpty(strSearch) Then
+			If bVisible AndAlso IsNotEmpty(strFilter) Then
 				bVisible = False
 				For Each oCell As DataGridViewCell In oRow.Cells
-					If oCell.Value IsNot Nothing AndAlso oCell.Value.ToString().ToLower().Contains(strSearch) Then bVisible = True : Exit For
+					For Each strSearch As String In strFilter.Split({" "c}, StringSplitOptions.RemoveEmptyEntries)
+						If oCell.Value IsNot Nothing AndAlso oCell.Value.ToString().ToLower().Contains(strSearch) Then bVisible = True : Exit For
+					Next
 				Next
 			End If
 
+			cmdSearch.Text = (oRow.Index + 1) & " / " & dgvContacts.RowCount
+			cmdSearch.Refresh()
 			If Not oRow.IsNewRow Then oRow.Visible = bVisible
 		Next
+
+		cmdSearch.Text = "&Search"
+		fraSearch.Enabled = True
 
 	End Sub
 
@@ -200,11 +209,11 @@
 	End Sub
 
 	Private Sub cmdAddPhone_Click(sender As System.Object, e As System.EventArgs) Handles cmdAddPhone.Click
-		If Not String.IsNullOrEmpty(cboPhoneTypes.SelectedItem.ToString()) Then InsertColumn(clContact.GetTypeByDesc(cboPhoneTypes.SelectedItem.ToString()))
+		If IsNotEmpty(cboPhoneTypes.SelectedItem.ToString()) Then InsertColumn(clContact.GetTypeByDesc(cboPhoneTypes.SelectedItem.ToString()))
 	End Sub
 
 	Private Sub cmdAddEMail_Click(sender As System.Object, e As System.EventArgs) Handles cmdAddEMail.Click
-		If Not String.IsNullOrEmpty(cboEMailTypes.SelectedItem.ToString()) Then InsertColumn(clContact.GetTypeByDesc(cboEMailTypes.SelectedItem.ToString()))
+		If IsNotEmpty(cboEMailTypes.SelectedItem.ToString()) Then InsertColumn(clContact.GetTypeByDesc(cboEMailTypes.SelectedItem.ToString()))
 	End Sub
 
 	Private Sub dgvContacts_RowPostPaint(ByVal sender As Object, ByVal e As DataGridViewRowPostPaintEventArgs) Handles dgvContacts.RowPostPaint
@@ -280,5 +289,60 @@
 		cmdUnlightMultiUsage.Enabled = bAllowUnlightMultiUsage
 		cmdUnlightDuplicate.Enabled = bAllowUnlightDuplicate
 	End Sub
+
+	Private Sub cmdExportCSV_Click(sender As Object, e As EventArgs) Handles cmdExportCSV.Click
+		Throw New NotImplementedException("CSV export not yet implemented")
+	End Sub
+
+	Private Sub cmdExportVCF_Click(sender As Object, e As EventArgs) Handles cmdExportVCF.Click
+		Dim frm As New System.Windows.Forms.FolderBrowserDialog()
+
+		If frm.ShowDialog(Me) = DialogResult.OK AndAlso IsNotEmpty(frm.SelectedPath) Then
+			For Each oRow As DataGridViewRow In dgvContacts.Rows
+				If oRow.Visible AndAlso Not oRow.IsNewRow Then
+					Dim oContact As clContact = GetContactFromRow(oRow)
+					Dim oContacts As New clContactList() : oContacts.Add(oContact)
+					Dim oFile As New clVCardFile(oContacts)
+					Dim strFile As String = If(IsEmpty(oContact.FileName), oContact.DisplayName, System.IO.Path.GetFileNameWithoutExtension(oContact.FileName)) & ".vcf"
+
+					oFile.WriteFile(frm.SelectedPath & System.IO.Path.DirectorySeparatorChar & strFile)
+				End If
+			Next
+		End If
+
+	End Sub
+
+	Private Function GetContactFromRow(oRow As DataGridViewRow)
+		Dim oContact As New clContact(oRow.Cells(oRow.Cells.Count - 1).Value)
+
+		' Respect column order at all places!!!
+		If oRow.Cells(0).Value IsNot Nothing Then oContact.DisplayName = oRow.Cells(0).Value.ToString().Trim()
+		If oRow.Cells(1).Value IsNot Nothing Then oContact.Prefix = oRow.Cells(1).Value.ToString().Trim()
+		If oRow.Cells(2).Value IsNot Nothing Then oContact.FirstName = oRow.Cells(2).Value.ToString().Trim()
+		If oRow.Cells(3).Value IsNot Nothing Then oContact.MiddleName = oRow.Cells(3).Value.ToString().Trim()
+		If oRow.Cells(4).Value IsNot Nothing Then oContact.LastName = oRow.Cells(4).Value.ToString().Trim()
+		If oRow.Cells(5).Value IsNot Nothing Then oContact.Suffix = oRow.Cells(5).Value.ToString().Trim()
+		If oRow.Cells(6).Value IsNot Nothing Then oContact.Organization = oRow.Cells(6).Value.ToString().Trim()
+		If oRow.Cells(7).Value IsNot Nothing Then oContact.Title = oRow.Cells(7).Value.ToString().Trim()
+
+		For i As Integer = 0 To moChannels.Count - 1
+			If oRow.Cells(mnChannelOffset + i).Value IsNot Nothing Then
+				Dim strChannel As String = oRow.Cells(mnChannelOffset + i).Value.ToString().Trim()
+				Dim nType As clContact.enType = moChannels(i)
+
+				For Each strContact As String In strChannel.Split({","c}, StringSplitOptions.RemoveEmptyEntries)
+					strContact = strContact.Trim()
+
+					If clContact.IsPhone(nType) AndAlso strContact.Length > 2 AndAlso strContact.StartsWith("0") AndAlso strContact.Chars(1) <> "0"c Then
+						strContact = "+49" & strContact.Substring(1)
+					End If
+
+					oContact.AddChannel(New clContact.clChannel(strContact, nType))
+				Next
+			End If
+		Next
+
+		Return oContact
+	End Function
 
 End Class

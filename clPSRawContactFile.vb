@@ -22,8 +22,13 @@ Public Class clPSRawContactFile
 			End Select
 		End While
 
+		oStream.Close()
 		Return oContacts
 	End Function
+
+	Public Overrides Sub WriteFile(strFile As String)
+		Throw New NotImplementedException("clPSRawContactFile.WriteFile() not implemented!")
+	End Sub
 
 	Private Function ReadContact(oReader As XmlReader) As clContact
 		Dim oContact As New clContact(FileName)
@@ -43,7 +48,7 @@ Public Class clPSRawContactFile
 						End If
 					ElseIf IsAnyOf(strCurrentNode, "ws:phones", "ws:emails") Then
 						If IsAnyOf(oReader.Name, "ws:PSPhone", "ws:PSEmail") Then
-							oContact.AddChannel(ReadChannel(oReader, oReader.Name))
+							ReadChannel(oReader, oReader.Name, oContact)
 							nElementStack -= 1
 						End If
 					Else
@@ -97,10 +102,10 @@ Public Class clPSRawContactFile
 			End Select
 		End If
 
-		Throw New Exception("clPSRawContactFile.GetChannelType(): Unsupported type '" & strNode & "/" & strType & "'!")
+		Throw New Exception("clPSRawContactFile.GetChannelType(): Unsupported channel type '" & strNode & "/" & strType & "'!")
 	End Function
 
-	Private Function ReadChannel(oReader As XmlReader, strNode As String) As clContact.clChannel
+	Private Sub ReadChannel(oReader As XmlReader, strNode As String, oContact As clContact)
 		Dim strContact As String = ""
 		Dim nType As clContact.enType = clContact.enType.Unknown
 		Dim nElementStack As Integer = 1
@@ -129,8 +134,8 @@ Public Class clPSRawContactFile
 			End Select
 		End While
 
-		Return New clContact.clChannel(strContact, nType)
-	End Function
+		oContact.AddChannel(New clContact.clChannel(strContact, nType))
+	End Sub
 
 	Private Sub ReadName(oReader As XmlReader, oContact As clContact)
 		Dim nElementStack As Integer = 1

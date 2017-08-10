@@ -87,7 +87,7 @@
 
 		Public Sub New(strContact As String, nType As enType)
 			strContact = strContact.Trim().Replace(" ", "").ToLower()
-			Contact = If(IsPhone(nType), FormatPhone(strContact), strContact)
+			Contact &= If(IsPhone(nType), FormatPhone(strContact), strContact)
 			Type = nType
 		End Sub
 
@@ -108,13 +108,5 @@
 	Public Sub AddChannel(oChannel As clChannel)
 		Channels.AddLast(oChannel)
 	End Sub
-
-	'Public Function GetPhones() As clChannel()
-	'	Return (From c In Channels Where c.IsPhone Select c).ToArray()
-	'End Function
-
-	'Public Function GetEMails() As clChannel()
-	'	Return (From c In Channels Where c.IsEMail Select c).ToArray()
-	'End Function
 
 End Class

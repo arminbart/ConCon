@@ -34,7 +34,15 @@ Partial Class frmContactList
 		Me.cmdUnlightDuplicate = New System.Windows.Forms.Button()
 		Me.txtSearch = New System.Windows.Forms.TextBox()
 		Me.cmdSearch = New System.Windows.Forms.Button()
+		Me.cmdExportCSV = New System.Windows.Forms.Button()
+		Me.cmdExportVCF = New System.Windows.Forms.Button()
+		Me.fraSearch = New System.Windows.Forms.GroupBox()
+		Me.fraContacts = New System.Windows.Forms.GroupBox()
+		Me.fraChannels = New System.Windows.Forms.GroupBox()
 		CType(Me.dgvContacts, System.ComponentModel.ISupportInitialize).BeginInit()
+		Me.fraSearch.SuspendLayout()
+		Me.fraContacts.SuspendLayout()
+		Me.fraChannels.SuspendLayout()
 		Me.SuspendLayout()
 		'
 		'dgvContacts
@@ -43,15 +51,15 @@ Partial Class frmContactList
 			Or System.Windows.Forms.AnchorStyles.Left) _
 			Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
 		Me.dgvContacts.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-		Me.dgvContacts.Location = New System.Drawing.Point(12, 68)
+		Me.dgvContacts.Location = New System.Drawing.Point(12, 91)
 		Me.dgvContacts.Name = "dgvContacts"
-		Me.dgvContacts.Size = New System.Drawing.Size(1160, 632)
+		Me.dgvContacts.Size = New System.Drawing.Size(1160, 580)
 		Me.dgvContacts.TabIndex = 0
 		'
 		'cmdAddPhone
 		'
 		Me.cmdAddPhone.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-		Me.cmdAddPhone.Location = New System.Drawing.Point(896, 39)
+		Me.cmdAddPhone.Location = New System.Drawing.Point(8, 42)
 		Me.cmdAddPhone.Name = "cmdAddPhone"
 		Me.cmdAddPhone.Size = New System.Drawing.Size(135, 23)
 		Me.cmdAddPhone.TabIndex = 1
@@ -61,7 +69,7 @@ Partial Class frmContactList
 		'cmdAddEMail
 		'
 		Me.cmdAddEMail.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-		Me.cmdAddEMail.Location = New System.Drawing.Point(1037, 39)
+		Me.cmdAddEMail.Location = New System.Drawing.Point(149, 42)
 		Me.cmdAddEMail.Name = "cmdAddEMail"
 		Me.cmdAddEMail.Size = New System.Drawing.Size(135, 23)
 		Me.cmdAddEMail.TabIndex = 2
@@ -72,7 +80,7 @@ Partial Class frmContactList
 		'
 		Me.cboPhoneTypes.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
 		Me.cboPhoneTypes.FormattingEnabled = True
-		Me.cboPhoneTypes.Location = New System.Drawing.Point(896, 14)
+		Me.cboPhoneTypes.Location = New System.Drawing.Point(8, 17)
 		Me.cboPhoneTypes.Name = "cboPhoneTypes"
 		Me.cboPhoneTypes.Size = New System.Drawing.Size(135, 21)
 		Me.cboPhoneTypes.TabIndex = 3
@@ -81,7 +89,7 @@ Partial Class frmContactList
 		'
 		Me.cboEMailTypes.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
 		Me.cboEMailTypes.FormattingEnabled = True
-		Me.cboEMailTypes.Location = New System.Drawing.Point(1037, 14)
+		Me.cboEMailTypes.Location = New System.Drawing.Point(149, 17)
 		Me.cboEMailTypes.Name = "cboEMailTypes"
 		Me.cboEMailTypes.Size = New System.Drawing.Size(135, 21)
 		Me.cboEMailTypes.TabIndex = 4
@@ -90,7 +98,7 @@ Partial Class frmContactList
 		'
 		Me.chkFilterDuplicates.AutoSize = True
 		Me.chkFilterDuplicates.Enabled = False
-		Me.chkFilterDuplicates.Location = New System.Drawing.Point(12, 43)
+		Me.chkFilterDuplicates.Location = New System.Drawing.Point(184, 48)
 		Me.chkFilterDuplicates.Name = "chkFilterDuplicates"
 		Me.chkFilterDuplicates.Size = New System.Drawing.Size(128, 17)
 		Me.chkFilterDuplicates.TabIndex = 5
@@ -101,7 +109,7 @@ Partial Class frmContactList
 		'
 		Me.chkFilterMultiUsage.AutoSize = True
 		Me.chkFilterMultiUsage.Enabled = False
-		Me.chkFilterMultiUsage.Location = New System.Drawing.Point(12, 16)
+		Me.chkFilterMultiUsage.Location = New System.Drawing.Point(184, 21)
 		Me.chkFilterMultiUsage.Name = "chkFilterMultiUsage"
 		Me.chkFilterMultiUsage.Size = New System.Drawing.Size(173, 17)
 		Me.chkFilterMultiUsage.TabIndex = 6
@@ -110,7 +118,7 @@ Partial Class frmContactList
 		'
 		'cmdRemove
 		'
-		Me.cmdRemove.Location = New System.Drawing.Point(447, 39)
+		Me.cmdRemove.Location = New System.Drawing.Point(6, 42)
 		Me.cmdRemove.Name = "cmdRemove"
 		Me.cmdRemove.Size = New System.Drawing.Size(135, 23)
 		Me.cmdRemove.TabIndex = 7
@@ -119,7 +127,7 @@ Partial Class frmContactList
 		'
 		'cmdUnlightMultiUsage
 		'
-		Me.cmdUnlightMultiUsage.Location = New System.Drawing.Point(191, 12)
+		Me.cmdUnlightMultiUsage.Location = New System.Drawing.Point(363, 17)
 		Me.cmdUnlightMultiUsage.Name = "cmdUnlightMultiUsage"
 		Me.cmdUnlightMultiUsage.Size = New System.Drawing.Size(229, 23)
 		Me.cmdUnlightMultiUsage.TabIndex = 8
@@ -128,7 +136,7 @@ Partial Class frmContactList
 		'
 		'cmdUnlightDuplicate
 		'
-		Me.cmdUnlightDuplicate.Location = New System.Drawing.Point(191, 39)
+		Me.cmdUnlightDuplicate.Location = New System.Drawing.Point(363, 44)
 		Me.cmdUnlightDuplicate.Name = "cmdUnlightDuplicate"
 		Me.cmdUnlightDuplicate.Size = New System.Drawing.Size(229, 23)
 		Me.cmdUnlightDuplicate.TabIndex = 9
@@ -137,43 +145,100 @@ Partial Class frmContactList
 		'
 		'txtSearch
 		'
-		Me.txtSearch.Location = New System.Drawing.Point(663, 14)
+		Me.txtSearch.Location = New System.Drawing.Point(6, 19)
 		Me.txtSearch.Name = "txtSearch"
 		Me.txtSearch.Size = New System.Drawing.Size(135, 20)
 		Me.txtSearch.TabIndex = 10
 		'
 		'cmdSearch
 		'
-		Me.cmdSearch.Location = New System.Drawing.Point(663, 39)
+		Me.cmdSearch.Location = New System.Drawing.Point(6, 44)
 		Me.cmdSearch.Name = "cmdSearch"
 		Me.cmdSearch.Size = New System.Drawing.Size(135, 23)
 		Me.cmdSearch.TabIndex = 11
 		Me.cmdSearch.Text = "&Search"
 		Me.cmdSearch.UseVisualStyleBackColor = True
 		'
+		'cmdExportCSV
+		'
+		Me.cmdExportCSV.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+		Me.cmdExportCSV.Enabled = False
+		Me.cmdExportCSV.Location = New System.Drawing.Point(1037, 677)
+		Me.cmdExportCSV.Name = "cmdExportCSV"
+		Me.cmdExportCSV.Size = New System.Drawing.Size(135, 23)
+		Me.cmdExportCSV.TabIndex = 12
+		Me.cmdExportCSV.Text = "Export &CSV"
+		Me.cmdExportCSV.UseVisualStyleBackColor = True
+		'
+		'cmdExportVCF
+		'
+		Me.cmdExportVCF.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+		Me.cmdExportVCF.Location = New System.Drawing.Point(896, 677)
+		Me.cmdExportVCF.Name = "cmdExportVCF"
+		Me.cmdExportVCF.Size = New System.Drawing.Size(135, 23)
+		Me.cmdExportVCF.TabIndex = 13
+		Me.cmdExportVCF.Text = "Export &vCard"
+		Me.cmdExportVCF.UseVisualStyleBackColor = True
+		'
+		'fraSearch
+		'
+		Me.fraSearch.Controls.Add(Me.txtSearch)
+		Me.fraSearch.Controls.Add(Me.cmdSearch)
+		Me.fraSearch.Controls.Add(Me.cmdUnlightDuplicate)
+		Me.fraSearch.Controls.Add(Me.chkFilterDuplicates)
+		Me.fraSearch.Controls.Add(Me.cmdUnlightMultiUsage)
+		Me.fraSearch.Controls.Add(Me.chkFilterMultiUsage)
+		Me.fraSearch.Location = New System.Drawing.Point(12, 12)
+		Me.fraSearch.Name = "fraSearch"
+		Me.fraSearch.Size = New System.Drawing.Size(601, 73)
+		Me.fraSearch.TabIndex = 15
+		Me.fraSearch.TabStop = False
+		Me.fraSearch.Text = "Search and Filter"
+		'
+		'fraContacts
+		'
+		Me.fraContacts.Controls.Add(Me.cmdRemove)
+		Me.fraContacts.Location = New System.Drawing.Point(619, 14)
+		Me.fraContacts.Name = "fraContacts"
+		Me.fraContacts.Size = New System.Drawing.Size(151, 71)
+		Me.fraContacts.TabIndex = 16
+		Me.fraContacts.TabStop = False
+		Me.fraContacts.Text = "Add/Remove Contacts"
+		'
+		'fraChannels
+		'
+		Me.fraChannels.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+		Me.fraChannels.Controls.Add(Me.cmdAddPhone)
+		Me.fraChannels.Controls.Add(Me.cmdAddEMail)
+		Me.fraChannels.Controls.Add(Me.cboPhoneTypes)
+		Me.fraChannels.Controls.Add(Me.cboEMailTypes)
+		Me.fraChannels.Location = New System.Drawing.Point(882, 14)
+		Me.fraChannels.Name = "fraChannels"
+		Me.fraChannels.Size = New System.Drawing.Size(290, 71)
+		Me.fraChannels.TabIndex = 17
+		Me.fraChannels.TabStop = False
+		Me.fraChannels.Text = "Add Communication Channels"
+		'
 		'frmContactList
 		'
 		Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
 		Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
 		Me.ClientSize = New System.Drawing.Size(1184, 712)
-		Me.Controls.Add(Me.cmdSearch)
-		Me.Controls.Add(Me.txtSearch)
-		Me.Controls.Add(Me.cmdUnlightDuplicate)
-		Me.Controls.Add(Me.cmdUnlightMultiUsage)
-		Me.Controls.Add(Me.cmdRemove)
-		Me.Controls.Add(Me.chkFilterMultiUsage)
-		Me.Controls.Add(Me.chkFilterDuplicates)
-		Me.Controls.Add(Me.cboEMailTypes)
-		Me.Controls.Add(Me.cboPhoneTypes)
-		Me.Controls.Add(Me.cmdAddEMail)
-		Me.Controls.Add(Me.cmdAddPhone)
+		Me.Controls.Add(Me.fraChannels)
+		Me.Controls.Add(Me.fraContacts)
+		Me.Controls.Add(Me.fraSearch)
+		Me.Controls.Add(Me.cmdExportVCF)
+		Me.Controls.Add(Me.cmdExportCSV)
 		Me.Controls.Add(Me.dgvContacts)
 		Me.MinimumSize = New System.Drawing.Size(1200, 750)
 		Me.Name = "frmContactList"
 		Me.Text = "frmContactList"
 		CType(Me.dgvContacts, System.ComponentModel.ISupportInitialize).EndInit()
+		Me.fraSearch.ResumeLayout(False)
+		Me.fraSearch.PerformLayout()
+		Me.fraContacts.ResumeLayout(False)
+		Me.fraChannels.ResumeLayout(False)
 		Me.ResumeLayout(False)
-		Me.PerformLayout()
 
 	End Sub
 
@@ -189,4 +254,9 @@ Partial Class frmContactList
 	Friend WithEvents cmdUnlightDuplicate As System.Windows.Forms.Button
 	Friend WithEvents txtSearch As TextBox
 	Friend WithEvents cmdSearch As Button
+	Friend WithEvents cmdExportCSV As Button
+	Friend WithEvents cmdExportVCF As Button
+	Friend WithEvents fraSearch As GroupBox
+	Friend WithEvents fraContacts As GroupBox
+	Friend WithEvents fraChannels As GroupBox
 End Class

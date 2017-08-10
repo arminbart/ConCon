@@ -9,6 +9,11 @@
 		moLogger = oLogger
 	End Sub
 
+	Public Sub New(oContacts As clContactList)
+		moContacts = oContacts
+		moLogger = Nothing
+	End Sub
+
 	Public ReadOnly Property FileName As String
 		Get
 			Return mstrFile
@@ -36,6 +41,8 @@
 
 	Protected MustOverride Function ReadFile() As clContactList
 
+	Public MustOverride Sub WriteFile(strFile As String)
+
 
 	Public Shared Function ReadFile(strFile As String, oLogger As Logger) As clContactList
 		Try
@@ -43,13 +50,11 @@
 
 			If strFile.EndsWith(".xml", StringComparison.CurrentCultureIgnoreCase) Then
 				oFile = New clPSRawContactFile(strFile, oLogger)
-				If Not oFile.IsValidFile() Then oFile = Nothing
 			ElseIf strFile.EndsWith(".vcf", StringComparison.CurrentCultureIgnoreCase) Then
-				Debug.Assert(False, ".vcf yet to implement!")
-				Throw New NotImplementedException()
+				oFile = New clVCardFile(strFile, oLogger)
 			End If
 
-			If oFile IsNot Nothing Then Return oFile.GetContacts()
+			If oFile IsNot Nothing AndAlso oFile.IsValidFile Then Return oFile.GetContacts()
 		Catch ex As Exception
 			LogException(oLogger, ex, strFile)
 		End Try
@@ -57,16 +62,26 @@
 		Return New clContactList()
 	End Function
 
+	Public Shared Function ReadFilesFromFolder(strPath As String, oLogger As Logger) As clContactList
+		Dim oContacts As New clContactList()
+
+		Try
+			Dim arrFiles As String() = System.IO.Directory.GetFiles(strPath)
+
+			For Each strFile As String In arrFiles
+				For Each oContact As clContact In clContactFile.ReadFile(strFile, oLogger)
+					oContacts.AddLast(oContact)
+				Next
+			Next
+		Catch ex As Exception
+			LogException(oLogger, ex, strPath)
+		End Try
+
+		Return oContacts
+	End Function
+
 	Public Shared Sub LogException(oLogger As Logger, ex As Exception, strFile As String)
-		oLogger.Log("Error: " & ex.Message & vbCrLf & "   in File " & strFile)
+		oLogger.Log("Error: " & ex.Message & vbCrLf & "   from " & strFile)
 	End Sub
 
-	Public Shared Function IsAnyOf(str As String, ParamArray values As String()) As Boolean
-
-		For Each strValue In values
-			If str.Equals(strValue, StringComparison.CurrentCultureIgnoreCase) Then Return True
-		Next
-
-		Return False
-	End Function
 End Class
