@@ -293,11 +293,33 @@
 	End Sub
 
 	Private Sub cmdExportCSV_Click(sender As Object, e As EventArgs) Handles cmdExportCSV.Click
-		Throw New NotImplementedException("CSV export not yet implemented")
+		Dim frm As New SaveFileDialog()
+
+		If frm.ShowDialog(Me) = DialogResult.OK AndAlso IsNotEmpty(frm.FileName) Then
+			Dim oWriter As New System.IO.StreamWriter(frm.FileName)
+
+			For Each oRow As DataGridViewRow In dgvContacts.Rows
+				If oRow.Visible AndAlso Not oRow.IsNewRow Then
+					Dim strLine As New System.Text.StringBuilder(If(oRow.Cells(0).Value, "").ToString().Trim())
+
+					For i As Integer = 1 To dgvContacts.ColumnCount - 1
+						Dim oCell As DataGridViewCell = oRow.Cells(i)
+
+						strLine.Append(";"c)
+						strLine.Append(If(oRow.Cells(i).Value, "").ToString().Trim().Replace(";"c, ","))
+					Next
+
+					oWriter.WriteLine(strLine.ToString())
+				End If
+			Next
+
+			oWriter.Close()
+		End If
+
 	End Sub
 
 	Private Sub cmdExportVCF_Click(sender As Object, e As EventArgs) Handles cmdExportVCF.Click
-		Dim frm As New System.Windows.Forms.FolderBrowserDialog()
+		Dim frm As New FolderBrowserDialog()
 
 		If frm.ShowDialog(Me) = DialogResult.OK AndAlso IsNotEmpty(frm.SelectedPath) Then
 			For Each oRow As DataGridViewRow In dgvContacts.Rows

@@ -162,7 +162,6 @@ Partial Class frmContactList
 		'cmdExportCSV
 		'
 		Me.cmdExportCSV.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-		Me.cmdExportCSV.Enabled = False
 		Me.cmdExportCSV.Location = New System.Drawing.Point(1037, 677)
 		Me.cmdExportCSV.Name = "cmdExportCSV"
 		Me.cmdExportCSV.Size = New System.Drawing.Size(135, 23)

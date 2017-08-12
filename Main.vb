@@ -19,11 +19,10 @@ Public Class Main
 
 		frm.Filter = "vCard files (*.vcf)|*.vcf|HTC HSM-Backup files (*.xml)|*.xml|All Files (*.*)|*.*"
 
-		If frm.ShowDialog(Me) = DialogResult.OK Then
+		If frm.ShowDialog(Me) = DialogResult.OK AndAlso IsNotEmpty(frm.FileName) Then
 			Dim oContacts As New clContactList()
-			Dim strFile As String = frm.FileName
 
-			For Each oContact As clContact In clContactFile.ReadFile(strFile, Me)
+			For Each oContact As clContact In clContactFile.ReadFile(frm.FileName, Me)
 				oContacts.AddLast(oContact)
 			Next
 
