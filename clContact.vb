@@ -1,18 +1,19 @@
 ﻿Public Class clContact
 
-	Public DisplayName As String
-	Public Prefix As String
-	Public FirstName As String
-	Public MiddleName As String
-	Public LastName As String
-	Public Suffix As String
+	Private mstrDisplayName As String
 
-	Public Organization As String
-	Public Title As String
+	Public Property Prefix As String
+	Public Property FirstName As String
+	Public Property MiddleName As String
+	Public Property LastName As String
+	Public Property Suffix As String
 
-	Public Channels As New Generic.LinkedList(Of clContact.clChannel)()
+	Public Property Organization As String
+	Public Property Title As String
 
-	Public FileName As String
+	Public Property Channels As New Generic.LinkedList(Of clContact.clChannel)()
+
+	Public Property FileName As String
 
 	Public Sub New(strFile As String)
 		FileName = strFile
@@ -39,6 +40,23 @@
 		EMailOther = 22
 		EMAIL_END = 23
 	End Enum
+
+	Public Property DisplayName() As String
+		Get
+			If IsEmpty(mstrDisplayName) Then
+				mstrDisplayName = If(IsNotEmpty(FirstName), FirstName, "")
+				If IsNotEmpty(MiddleName) Then mstrDisplayName &= If(IsNotEmpty(mstrDisplayName), " ", "") & MiddleName
+				If IsNotEmpty(LastName) Then mstrDisplayName &= If(IsNotEmpty(mstrDisplayName), " ", "") & LastName
+				If IsNotEmpty(Suffix) Then mstrDisplayName &= If(IsNotEmpty(mstrDisplayName), ", ", "") & Suffix
+				mstrDisplayName = mstrDisplayName.Trim()
+			End If
+
+			Return mstrDisplayName
+		End Get
+		Set(value As String)
+			mstrDisplayName = value
+		End Set
+	End Property
 
 	Public Shared Function GetTypeDesc(nType As enType) As String
 		Select Case nType
