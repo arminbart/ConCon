@@ -231,7 +231,7 @@ Partial Class frmContactList
 		Me.Controls.Add(Me.dgvContacts)
 		Me.MinimumSize = New System.Drawing.Size(1200, 750)
 		Me.Name = "frmContactList"
-		Me.Text = "frmContactList"
+		Me.Text = "ConCon - Contact List"
 		CType(Me.dgvContacts, System.ComponentModel.ISupportInitialize).EndInit()
 		Me.fraSearch.ResumeLayout(False)
 		Me.fraSearch.PerformLayout()

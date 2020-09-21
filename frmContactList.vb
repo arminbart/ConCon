@@ -1,5 +1,7 @@
 ﻿Public Class frmContactList
 
+	Private Shared snListNr As Integer = 0
+
 	Private mnChannelOffset As Integer = 0
 	Private moChannels As New List(Of clContact.enType)
 	Private moDuplicates As New Dictionary(Of String, Integer)
@@ -15,6 +17,9 @@
 		InitializeComponent()
 
 		' Add any initialization after the InitializeComponent() call.
+		snListNr += 1
+		Text = Text & " " & snListNr
+
 		For nPhoneType As clContact.enType = clContact.enType.PHONE_BEGIN + 1 To clContact.enType.PHONE_END - 1
 			cboPhoneTypes.Items.Add(clContact.GetTypeDesc(nPhoneType))
 		Next
