@@ -32,13 +32,14 @@
 		MobileOther = 17
 		PhoneOther = 18
 		FaxOther = 19
-		PHONE_END = 20
+		PhoneMain = 20 ' Main/Festnetz
+		PHONE_END = 21
 
-		EMAIL_BEGIN = 20
-		EMailPrivate = 21
-		EMailBusiness = 22
-		EMailOther = 22
-		EMAIL_END = 23
+		EMAIL_BEGIN = 30
+		EMailPrivate = 31
+		EMailBusiness = 32
+		EMailOther = 32
+		EMAIL_END = 33
 	End Enum
 
 	Public Property DisplayName() As String
@@ -69,6 +70,7 @@
 			Case enType.MobileOther : Return "Mobile oth."
 			Case enType.PhoneOther : Return "Phone oth."
 			Case enType.FaxOther : Return "Fax oth."
+			Case enType.PhoneMain : Return "Phone main"
 
 			Case enType.EMailPrivate : Return "E-Mail priv."
 			Case enType.EMailBusiness : Return "E-Mail biz."
