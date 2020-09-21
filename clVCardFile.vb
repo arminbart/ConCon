@@ -114,7 +114,7 @@ Public Class clVCardFile
 			Case "ORG" : oContact.Organization = oItem.Value.Trim(New Char() {vbTab, " "c, ";"c})
 			Case "TITLE" : oContact.Title = oItem.Value
 			Case "TEL", "EMAIL" : ReadChannel(oItem, oContact)
-			Case Else : Throw New Exception("clVCardFile.ReadContact(): Unsupported element '" & oItem.Name & "'!")
+			Case Else : moLogger.Log(FileName & ": Skip unsupported VCard element '" & oItem.Name & "'!")
 		End Select
 	End Sub
 

@@ -2,7 +2,7 @@
 
 	Private mstrFile As String
 	Private moContacts As clContactList = Nothing
-	Private moLogger As Logger
+	Protected moLogger As Logger
 
 	Public Sub New(strFile As String, oLogger As Logger)
 		mstrFile = strFile
