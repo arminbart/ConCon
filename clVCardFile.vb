@@ -77,6 +77,10 @@ Public Class clVCardFile
 			Dim strKey As String = arrLine(0).Trim().ToUpper()
 
 			If strLine.Trim().Length = 0 Then Continue While
+			If strLine.StartsWith(" ") AndAlso oItem IsNot Nothing AndAlso IsAnyOf(oItem.Name, "ADR", "PHOTO") Then ' Continue value from previous line
+				oItem.Value &= strLine.Trim()
+				Continue While
+			End If
 
 			If strKey = "VERSION" Then Continue While ' We don't care (only know version 2.1 and 3.0 and hope the others are compatible ;-)
 			If strKey = "END" Then Exit While
@@ -113,7 +117,7 @@ Public Class clVCardFile
 			Case "FN" : oContact.DisplayName = oItem.Value
 			Case "ORG" : oContact.Organization = oItem.Value.Trim(New Char() {vbTab, " "c, ";"c})
 			Case "TITLE" : oContact.Title = oItem.Value
-			Case "TEL", "EMAIL" : ReadChannel(oItem, oContact)
+			Case "TEL", "EMAIL", "ADR" : ReadChannel(oItem, oContact)
 			Case Else : moLogger.Log(FileName & ": Skip unsupported VCard element '" & oItem.Name & "'!")
 		End Select
 	End Sub
@@ -148,6 +152,10 @@ Public Class clVCardFile
 			Case clContact.enType.EMailBusiness : strTag = "EMAIL;INTERNET;WORK"
 			Case clContact.enType.EMailOther : strTag = "EMAIL;INTERNET"
 
+			Case clContact.enType.AddressPrivate : strTag = "ADR;HOME"
+			Case clContact.enType.AddressBusiness : strTag = "ADR;WORK"
+			Case clContact.enType.AddressOther : strTag = "ADR"
+
 			Case Else
 				Throw New Exception("clVCardFile.GetChannelTagFromType(): Unsupported channel type '" & nType & "'!")
 		End Select
@@ -162,6 +170,7 @@ Public Class clVCardFile
 		Select Case oItem.Name
 			Case "TEL" : nType = clContact.enType.PhoneOther
 			Case "EMAIL" : nType = clContact.enType.EMailOther
+			Case "ADR" : nType = clContact.enType.AddressOther
 			Case Else : Throw New Exception("clVCardFile.GetChannelType(): Unsupported channel type '" & oItem.Name & "'!")
 		End Select
 
@@ -175,9 +184,11 @@ Public Class clVCardFile
 					Case "FAX" : nLine = clContact.enType.FaxOther
 					Case "HOME", "PRIVAT"
 						If nType = clContact.enType.EMailOther Then Return clContact.enType.EMailPrivate
+						If nType = clContact.enType.AddressOther Then Return clContact.enType.AddressPrivate
 						nType = clContact.enType.PhonePrivate
 					Case "WORK", "ARBEIT"
 						If nType = clContact.enType.EMailOther Then Return clContact.enType.EMailBusiness
+						If nType = clContact.enType.AddressOther Then Return clContact.enType.AddressBusiness
 						nType = clContact.enType.PhoneBusiness
 					Case "MAIN"
 						If nType = clContact.enType.PhoneOther Then Return clContact.enType.PhoneMain
@@ -201,11 +212,28 @@ Public Class clVCardFile
 		Return nType
 	End Function
 
+	Private Sub ReadAddress(oItem As clVCardItem, oContact As clContact, nType As clContact.enType)
+		Dim oAddr As New clContact.clAddress(oItem.Value, nType)
+		Dim arrValue As String() = oItem.ValueArray
+
+		If arrValue.Length > 2 Then oAddr.Street = arrValue(2).Trim()
+		If arrValue.Length > 3 Then oAddr.City = arrValue(3).Trim()
+		'If arrValue.Length > 4 Then ?
+		If arrValue.Length > 5 Then oAddr.Zip = arrValue(5).Trim()
+		If arrValue.Length > 6 Then oAddr.Country = arrValue(6).Trim()
+
+		oContact.AddChannel(oAddr)
+	End Sub
+
 	Private Sub ReadChannel(oItem As clVCardItem, oContact As clContact)
 		Dim bPrimary As Boolean = False
 		Dim nType As clContact.enType = GetChannelType(oItem, bPrimary)
 
-		oContact.AddChannel(New clContact.clChannel(oItem.Value, nType, bPrimary))
+		If clContact.IsAddress(nType) Then
+			ReadAddress(oItem, oContact, nType)
+		Else
+			oContact.AddChannel(New clContact.clChannel(oItem.Value, nType, bPrimary))
+		End If
 
 	End Sub
 

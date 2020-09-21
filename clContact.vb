@@ -40,6 +40,12 @@
 		EMailBusiness = 32
 		EMailOther = 32
 		EMAIL_END = 33
+
+		ADDRESS_BEGIN = 50
+		AddressPrivate = 51
+		AddressBusiness = 52
+		AddressOther = 53
+		ADDRESS_END = 54
 	End Enum
 
 	Public Property DisplayName() As String
@@ -76,6 +82,10 @@
 			Case enType.EMailBusiness : Return "E-Mail biz."
 			Case enType.EMailOther : Return "E-Mail oth."
 
+			Case enType.AddressPrivate : Return "Address priv."
+			Case enType.AddressBusiness : Return "Address biz."
+			Case enType.AddressOther : Return "Address oth."
+
 			Case Else : Return "Unknown"
 		End Select
 	End Function
@@ -99,6 +109,10 @@
 
 	Public Shared Function IsEMail(nType As enType)
 		Return nType > enType.EMAIL_BEGIN And nType < enType.EMAIL_END
+	End Function
+
+	Public Shared Function IsAddress(nType As enType)
+		Return nType > enType.ADDRESS_BEGIN And nType < enType.ADDRESS_END
 	End Function
 
 	Public Class clChannel
@@ -125,6 +139,19 @@
 
 			Return strFormatted.ToString()
 		End Function
+	End Class
+
+	Public Class clAddress
+		Inherits clChannel
+
+		Public Street As String
+		Public Zip As String
+		Public City As String
+		Public Country As String
+
+		Public Sub New(strContact As String, nType As enType)
+			MyBase.New(strContact, nType, False)
+		End Sub
 	End Class
 
 	Public Sub AddChannel(oChannel As clChannel)
