@@ -3,11 +3,12 @@
 	Private mnChannelOffset As Integer = 0
 	Private moChannels As New List(Of clContact.enType)
 	Private moDuplicates As New Dictionary(Of String, Integer)
+	Private moLogger As Logger
 
 	Private COLOR_HIGHLIGHT As System.Drawing.Color = Color.Red
 	Private COLOR_DOUBLEHIGHLIGHT As System.Drawing.Color = Color.Orange
 
-	Public Sub New(oContacts As clContactList)
+	Public Sub New(oContacts As clContactList, oLogger As Logger)
 		MyBase.New()
 
 		' This call is required by the designer.
@@ -41,6 +42,7 @@
 		mnChannelOffset = dgvContacts.ColumnCount
 		dgvContacts.Columns.Add("File", "File Name")
 
+		moLogger = oLogger
 		If oContacts IsNot Nothing Then
 			For Each oContact In oContacts
 				AddContact(oContact)
@@ -296,24 +298,28 @@
 		Dim frm As New SaveFileDialog()
 
 		If frm.ShowDialog(Me) = DialogResult.OK AndAlso IsNotEmpty(frm.FileName) Then
-			Dim oWriter As New System.IO.StreamWriter(frm.FileName)
+			Try
+				Dim oWriter As New System.IO.StreamWriter(frm.FileName)
 
-			For Each oRow As DataGridViewRow In dgvContacts.Rows
-				If oRow.Visible AndAlso Not oRow.IsNewRow Then
-					Dim strLine As New System.Text.StringBuilder(If(oRow.Cells(0).Value, "").ToString().Trim())
+				For Each oRow As DataGridViewRow In dgvContacts.Rows
+					If oRow.Visible AndAlso Not oRow.IsNewRow Then
+						Dim strLine As New System.Text.StringBuilder(If(oRow.Cells(0).Value, "").ToString().Trim())
 
-					For i As Integer = 1 To dgvContacts.ColumnCount - 1
-						Dim oCell As DataGridViewCell = oRow.Cells(i)
+						For i As Integer = 1 To dgvContacts.ColumnCount - 1
+							Dim oCell As DataGridViewCell = oRow.Cells(i)
 
-						strLine.Append(";"c)
-						strLine.Append(If(oRow.Cells(i).Value, "").ToString().Trim().Replace(";"c, ","))
-					Next
+							strLine.Append(";"c)
+							strLine.Append(If(oRow.Cells(i).Value, "").ToString().Trim().Replace(";"c, ","))
+						Next
 
-					oWriter.WriteLine(strLine.ToString())
-				End If
-			Next
+						oWriter.WriteLine(strLine.ToString())
+					End If
+				Next
 
-			oWriter.Close()
+				oWriter.Close()
+			Catch ex As Exception
+				clContactFile.LogException(moLogger, ex, frm.FileName)
+			End Try
 		End If
 
 	End Sub
@@ -329,14 +335,18 @@
 					Dim oFile As New clVCardFile(oContacts)
 					Dim strFile As String = If(IsEmpty(oContact.FileName), oContact.DisplayName, System.IO.Path.GetFileNameWithoutExtension(oContact.FileName)) & ".vcf"
 
-					oFile.WriteFile(frm.SelectedPath & System.IO.Path.DirectorySeparatorChar & strFile)
+					Try
+						oFile.WriteFile(frm.SelectedPath & System.IO.Path.DirectorySeparatorChar & strFile)
+					Catch ex As Exception
+						clContactFile.LogException(moLogger, ex, strFile)
+					End Try
 				End If
 			Next
 		End If
 
 	End Sub
 
-	Private Function GetContactFromRow(oRow As DataGridViewRow)
+	Private Function GetContactFromRow(oRow As DataGridViewRow) As clContact
 		Dim oContact As New clContact(oRow.Cells(oRow.Cells.Count - 1).Value)
 
 		' Respect column order at all places!!!

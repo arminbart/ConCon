@@ -9,7 +9,7 @@ Public Class Main
 	End Sub
 
 	Private Sub cmdNewList_Click(sender As System.Object, e As System.EventArgs) Handles cmdNewList.Click
-		Dim frmContacts As New frmContactList(Nothing)
+		Dim frmContacts As New frmContactList(Nothing, Me)
 
 		frmContacts.Show(Me)
 	End Sub
@@ -26,7 +26,7 @@ Public Class Main
 				oContacts.AddLast(oContact)
 			Next
 
-			Dim frmContacts As New frmContactList(oContacts)
+			Dim frmContacts As New frmContactList(oContacts, Me)
 
 			frmContacts.Show(Me)
 		End If
@@ -37,7 +37,7 @@ Public Class Main
 
 		If frm.ShowDialog(Me) = DialogResult.OK AndAlso IsNotEmpty(frm.SelectedPath) Then
 			Dim oContacts As clContactList = clContactFile.ReadFilesFromFolder(frm.SelectedPath, Me)
-			Dim frmContacts As New frmContactList(oContacts)
+			Dim frmContacts As New frmContactList(oContacts, Me)
 
 			frmContacts.Show(Me)
 		End If
