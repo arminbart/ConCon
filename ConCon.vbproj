@@ -75,8 +75,8 @@
     <Compile Include="clContact.vb" />
     <Compile Include="clContactFile.vb" />
     <Compile Include="clContactList.vb" />
-    <Compile Include="clPSRawContactFile.vb" />
-    <Compile Include="clVCardFile.vb" />
+    <Compile Include="FileTypes\clPSRawContactFile.vb" />
+    <Compile Include="FileTypes\clVCardFile.vb" />
     <Compile Include="frmContactList.Designer.vb">
       <DependentUpon>frmContactList.vb</DependentUpon>
     </Compile>
